@@ -123,7 +123,9 @@ class Game:
                 self.result = "No card left for draw"
                 return self
             self.player.draw()
+            self.player = self.get_next_player()
             return self
+
         elif action.value == "VII":
             self.deck.cards.append(action)
             self.player.hand.remove(action)
@@ -165,7 +167,6 @@ class Game:
             self.result = f"{self.player.name} won"
             return self
 
-        print(f"Table card: {self.deck.cards[-1]} {self.player.name} action: {action}")
         self.player = self.get_next_player()
         return self
 
@@ -178,16 +179,15 @@ karol.draw()
 karol.draw()
 karol.draw()
 karol.draw()
-karol.draw()
-karol.draw()
 terez.draw()
 terez.draw()
 terez.draw()
 terez.draw()
-
+terez.draw()
+terez.draw()
+terez.draw()
 # round
 while not game.done:
     moves = game.player.validmoves()
     game.player.play(random.choice(moves))
-    game.player.showHand()
 print(f"Done: {game.result}")
