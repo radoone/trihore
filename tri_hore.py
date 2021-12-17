@@ -6,9 +6,6 @@ class Card:
         self.suit = suit
         self.value = value
 
-    def __str__(self):
-        return '*' + self.suit + " *" + self.value + "*"
-
     def show(self):
         print("{}, {}".format(self.value, self.suit))
 
@@ -44,10 +41,10 @@ class Deck:
 
 
 class Player:
-    def __init__(self, name,game):
+    def __init__(self, name, game):
         self.name = name
         self.hand = []
-        self.game=game
+        self.game = game
 
     def draw(self):
         self.hand.append(self.game.deck.drawCard())
@@ -57,19 +54,21 @@ class Player:
         for card in self.hand:
             card.show()
 
+    def play(self, action):
+        return self.game.play(self, action)
+
 
 class Game():
     def __init__(self):
         self.deck = Deck()
         self.deck.shuffle()
         self.deck.drawtablecard()
-        self.players=[]
-    
-    def addPlayer(self,name):
-        palayer =Player(name,self)
-        self.players.append(palayer)
-        return palayer
+        self.players = []
 
+    def addPlayer(self, name):
+        player = Player(name, self)
+        self.players.append(player)
+        return player
 
     def validmoves(self, player):
         tablecard = self.deck.puttedcards[-1]
@@ -79,15 +78,15 @@ class Game():
                 actions.append(card)
         return actions
 
+    def play(self, player, action):
+        if action == "Draw":
+            player.draw()
+        print(f"{player.name} action: {action}")
 
 
 game = Game()
-
 karol = game.addPlayer("Karolinka")
 
-
-
-
 karol.draw()
 karol.draw()
 karol.draw()
@@ -100,7 +99,5 @@ karol.draw()
 karol.draw()
 
 
-
-
-karol.showHand()
+karol.play("Draw")
 print(game.validmoves(karol))
