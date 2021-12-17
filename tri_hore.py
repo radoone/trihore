@@ -5,9 +5,14 @@ class Card:
     def __init__(self, suit, value):
         self.suit = suit
         self.value = value
+        self.change = None
+
+    def __str__(self):
+        """Returns a human-readable string representation"""
+        return "%s %s" % (self.value, self.suit)
 
     def show(self):
-        print("{}, {}".format(self.value, self.suit))
+        print("{}, {}".format(self.value, self.suit), end=" ")
 
 
 class Deck:
@@ -17,8 +22,8 @@ class Deck:
         self.puttedcards = []
 
     def build(self):
-        for s in ["Zelen", "Cerven", "Gula", "Srdce"]:
-            for v in ["VII", "VII", "IX", "X", "Dolnik", "Hornik", "Kral", "Eso"]:
+        for v in ["Zelen", "Cerven", "Gula", "Srdce"]:
+            for s in ["VII", "VII", "IX", "X", "Dolnik", "Hornik", "Kral", "Eso"]:
                 self.cards.append(Card(v, s))
 
     def shuffle(self):
@@ -34,10 +39,10 @@ class Deck:
         return self.cards.pop()
 
     def drawtablecard(self):
-        self.puttedcards.append(self.drawCard())
+        self.cards.append(self.drawCard())
 
     def put(self, Card):
-        self.puttedcards.append(Card)
+        self.cards.append(Card)
 
 
 class Player:
@@ -53,38 +58,116 @@ class Player:
     def showHand(self):
         for card in self.hand:
             card.show()
+        print("# cards" + self.name + " " + str(len(self.hand)))
 
     def play(self, action):
-        return self.game.play(self, action)
+        return self.game.play(action)
 
     def validmoves(self):
-        return self.game.validmoves(self)
+        return self.game.validmoves()
 
 
-class Game():
+class Game:
     def __init__(self):
         self.deck = Deck()
         self.deck.shuffle()
         self.deck.drawtablecard()
         self.players = []
+        self.done = False
+        self.result = None
+        self.player = None
 
     def addPlayer(self, name):
         player = Player(name, self)
         self.players.append(player)
+        if self.player is None:
+            self.player = player
         return player
 
-    def validmoves(self, player):
-        tablecard = self.deck.puttedcards[-1]
-        actions = ['Draw']
-        for card in player.hand:
-            if(tablecard.suit == card.suit) or (tablecard.value == card.value):
+    def get_next_player(self):
+        if self.players.index(self.player) + 1 < len(self.players):
+            next_player = self.players[self.players.index(self.player) + 1]
+        else:
+            next_player = self.players[0]
+        return next_player
+
+    def validmoves(self):
+        tablecard = self.deck.cards[-1]
+        actions = ["Draw"]
+        for card in self.player.hand:
+
+            if card.value == "Hornik":
+                card.change = "Zelen"
                 actions.append(card)
+                card.change = "Cerven"
+                actions.append(card)
+                card.change = "Gula"
+                actions.append(card)
+                card.change = "Srdce"
+                actions.append(card)
+
+            elif (
+                (tablecard.suit == card.suit)
+                or (tablecard.value == card.value)
+                or card.value == "Eso"
+                and not card.value == "Hornik"
+            ):
+                actions.append(card)
+
         return actions
 
-    def play(self, player, action):
+    def play(self, action):
         if action == "Draw":
-            player.draw()
-        print(f"{player.name} action: {action}")
+            if len(self.deck.cards) <= 1:
+                self.done = True
+                self.result = "No card left for draw"
+                return self
+            self.player.draw()
+            return self
+        elif action.value == "VII":
+            self.deck.cards.append(action)
+            self.player.hand.remove(action)
+
+            if len(self.deck.cards) - 3 < 1:
+                self.done = True
+                self.result = "No card left for 3 draw"
+                return self
+            next_player = self.get_next_player()
+            next_player.draw()
+            next_player.draw()
+            next_player.draw()
+
+        elif action.value == "Eso":
+            self.deck.cards.append(action)
+            self.player.hand.remove(action)
+            if not self.player.hand:
+                self.done = True
+                self.result = f"{self.player} won"
+                return self
+
+            self.player = self.get_next_player()
+            self.player = self.get_next_player()
+
+            return self
+
+        elif action.change:
+
+            self.deck.cards.append(action)
+            self.player.hand.remove(action)
+            self.deck.cards[-1].suit = action.change
+
+        else:
+            self.deck.cards.append(action)
+            self.player.hand.remove(action)
+
+        if not self.player.hand:
+            self.done = True
+            self.result = f"{self.player.name} won"
+            return self
+
+        print(f"Table card: {self.deck.cards[-1]} {self.player.name} action: {action}")
+        self.player = self.get_next_player()
+        return self
 
 
 game = Game()
@@ -96,14 +179,15 @@ karol.draw()
 karol.draw()
 karol.draw()
 karol.draw()
-
-
-terez.draw()
+karol.draw()
 terez.draw()
 terez.draw()
 terez.draw()
 terez.draw()
 
-
-karol.play(random.choice(karol.validmoves()))
-terez.play(random.choice(terez.validmoves()))
+# round
+while not game.done:
+    moves = game.player.validmoves()
+    game.player.play(random.choice(moves))
+    game.player.showHand()
+print(f"Done: {game.result}")
