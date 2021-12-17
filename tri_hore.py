@@ -57,6 +57,9 @@ class Player:
     def play(self, action):
         return self.game.play(self, action)
 
+    def validmoves(self):
+        return self.game.validmoves(self)
+
 
 class Game():
     def __init__(self):
@@ -86,12 +89,8 @@ class Game():
 
 game = Game()
 karol = game.addPlayer("Karolinka")
+terez = game.addPlayer("Terezia")
 
-karol.draw()
-karol.draw()
-karol.draw()
-karol.draw()
-karol.draw()
 karol.draw()
 karol.draw()
 karol.draw()
@@ -99,5 +98,12 @@ karol.draw()
 karol.draw()
 
 
-karol.play("Draw")
-print(game.validmoves(karol))
+terez.draw()
+terez.draw()
+terez.draw()
+terez.draw()
+terez.draw()
+
+
+karol.play(random.choice(karol.validmoves()))
+terez.play(random.choice(terez.validmoves()))
