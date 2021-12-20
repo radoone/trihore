@@ -171,23 +171,60 @@ class Game:
         return self
 
 
-game = Game()
-karol = game.addPlayer("Karolinka")
-terez = game.addPlayer("Terezia")
+# game
 
-karol.draw()
-karol.draw()
-karol.draw()
-karol.draw()
-terez.draw()
-terez.draw()
-terez.draw()
-terez.draw()
-terez.draw()
-terez.draw()
-terez.draw()
-# round
-while not game.done:
-    moves = game.player.validmoves()
-    game.player.play(random.choice(moves))
-print(f"Done: {game.result}")
+num_rounds = 0
+
+
+def play():
+    game = Game()
+    karol = game.addPlayer("Karolinka")
+    terez = game.addPlayer("Terezia")
+
+    karol.draw()
+    karol.draw()
+    karol.draw()
+    karol.draw()
+    terez.draw()
+    terez.draw()
+    terez.draw()
+    terez.draw()
+    terez.draw()
+    terez.draw()
+    terez.draw()
+
+    i = 0
+    while not game.done:
+        i = i + 1
+        moves = game.player.validmoves()
+        game.player.play(random.choice(moves))
+
+    # print(f"Done: {game.result} #{i}")
+    return i
+
+
+i = 0
+for x in range(1, 100):
+    i = i + play()
+    vysledok = i / 100
+print(f"tahou: #{vysledok}")
+
+
+def init_game(game):
+    karol = game.addPlayer("Karolinka")
+    terez = game.addPlayer("Terezia")
+
+    karol.draw()
+    karol.draw()
+    karol.draw()
+    karol.draw()
+    karol.draw()
+    terez.draw()
+    terez.draw()
+    terez.draw()
+    terez.draw()
+    terez.draw()
+
+
+def computetree(game):
+    pass
